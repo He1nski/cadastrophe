@@ -5,6 +5,9 @@ let rectangles = [];
 let circles = [];
 let curves = [];
 let tempPoints = [];
+let mouseTrail = [];
+const TRAIL_LIFETIME = 3000;
+const TRAIL_COLOR = [255, 165, 0];
 let hoveredShape = null;
 
 class Line {
@@ -412,8 +415,8 @@ class RotationTool extends Tool {
     stroke(0);
     noFill();
     arc(0, 0, 20, 20, -PI/2, PI);
-    line(10, 0, 15, -2);
-    line(10, 0, 15, 2);
+    line(0, -10, 8, -13);
+    line(0, -10, 6, -1);
   }
 
   handlePress(x, y) {
@@ -439,17 +442,15 @@ class RotationTool extends Tool {
 
   drawPreview() {
     if (!this.selectedShape) {
-      // Show orange hover effect on shapes when no shape is selected
       let allShapes = [...lines, ...rectangles, ...circles, ...curves];
       for (let shape of allShapes) {
         if (shape.containsPoint(mouseX, mouseY)) {
-          stroke(255, 165, 0); // Orange color
+          stroke(255, 165, 0); 
           shape.draw(true);
           break;
         }
       }
     } else {
-      // Selected shape stays green
       stroke(0, 255, 0);
       this.selectedShape.draw(true);
       
@@ -465,9 +466,52 @@ class RotationTool extends Tool {
     }
   }
 }
+function updateMouseTrail() {
+  const currentTime = Date.now();
+  
+  if (mouseX > 80 && mouseX < width && mouseY > 0 && mouseY < height) {
+    mouseTrail.push({
+      x: mouseX,
+      y: mouseY,
+      timestamp: currentTime
+    });
+  }
+  
+  mouseTrail = mouseTrail.filter(point => 
+    currentTime - point.timestamp < TRAIL_LIFETIME
+  );
+}
 
+function drawMouseTrail() {
+  const currentTime = Date.now();
+  
+  noFill();
+  
+  beginShape();
+  for (let i = 0; i < mouseTrail.length; i++) {
+    const point = mouseTrail[i];
+    const age = currentTime - point.timestamp;
+    const alpha = map(age, 0, TRAIL_LIFETIME, 255, 0);
+    
+    stroke(TRAIL_COLOR[0], TRAIL_COLOR[1], TRAIL_COLOR[2], alpha);
+    if (i === 0) {
+      vertex(point.x, point.y);
+    } else {
+      const prev = mouseTrail[i - 1];
+      if (dist(point.x, point.y, prev.x, prev.y) < 50) {
+        vertex(point.x, point.y);
+      } else {
+        endShape();
+        beginShape();
+        vertex(point.x, point.y);
+      }
+    }
+  }
+  endShape();
+}
 function setup() {
   createCanvas(1920, 1080);
+  textFont('monospace');
   new LineTool('line', null, 20, 20);
   new RectangleTool('rectangle', null, 20, 70);
   new CircleTool('circle', null, 20, 120);
@@ -477,11 +521,21 @@ function setup() {
 }
 
 function draw() {
-  background(240);
+  background(255);
   
-  fill(200);
+  updateMouseTrail();
+  
+  fill(255);
   noStroke();
   rect(0, 0, 80, height);
+  
+  drawMouseTrail();
+  
+  fill(0);
+  noStroke();
+  textSize(15);
+  textAlign(LEFT, TOP);
+  text('life is on the line_', 400, 20);
   
   hoveredShape = null;
   if (currentTool instanceof EraserTool && mouseX > 80) {
