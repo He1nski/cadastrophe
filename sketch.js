@@ -7,7 +7,7 @@ let curves = [];
 let tempPoints = [];
 let mouseTrail = [];
 const TRAIL_LIFETIME = 3000;
-const TRAIL_COLOR = [255, 165, 0];
+const TRAIL_COLOR = [220, 115, 80];
 let hoveredShape = null;
 
 class Line {
@@ -77,7 +77,7 @@ class Rectangle {
   }
 
   containsPoint(px, py) {
-    const buffer = 8; // Increased from 5
+    const buffer = 8;
     if (this.rotation) {
       const cx = this.x + this.w/2;
       const cy = this.y + this.h/2;
@@ -256,7 +256,7 @@ class LineTool extends Tool {
   }
 
   handlePress(x, y) {
-    if (x < 80) return;
+    if (x < 70) return;
     
     if (!tempPoints.length) {
       tempPoints.push({ x, y });
@@ -282,7 +282,7 @@ class RectangleTool extends Tool {
   }
 
   handlePress(x, y) {
-    if (x < 80) return;
+    if (x < 70) return;
     
     if (!tempPoints.length) {
       tempPoints.push({ x, y });
@@ -310,7 +310,7 @@ class CircleTool extends Tool {
   }
 
   handlePress(x, y) {
-    if (x < 80) return;
+    if (x < 70) return;
     
     if (!tempPoints.length) {
       tempPoints.push({ x, y });
@@ -342,7 +342,7 @@ class BezierTool extends Tool {
   }
 
   handlePress(x, y) {
-    if (x < 80) return;
+    if (x < 70) return;
     
     tempPoints.push({ x, y });
     
@@ -420,7 +420,7 @@ class RotationTool extends Tool {
   }
 
   handlePress(x, y) {
-    if (x < 80) return;
+    if (x < 70) return;
 
     if (!this.selectedShape) {
       for (let shape of [...lines, ...rectangles, ...circles, ...curves]) {
@@ -466,17 +466,21 @@ class RotationTool extends Tool {
     }
   }
 }
+
 function updateMouseTrail() {
   const currentTime = Date.now();
-  
-  if (mouseX > 80 && mouseX < width && mouseY > 0 && mouseY < height) {
-    mouseTrail.push({
-      x: mouseX,
-      y: mouseY,
-      timestamp: currentTime
-    });
+  if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
+
+    if (mouseTrail.length === 0 || 
+        mouseTrail[mouseTrail.length - 1].x !== mouseX || 
+        mouseTrail[mouseTrail.length - 1].y !== mouseY) {
+      mouseTrail.push({
+        x: mouseX,
+        y: mouseY,
+        timestamp: currentTime
+      });
+    }
   }
-  
   mouseTrail = mouseTrail.filter(point => 
     currentTime - point.timestamp < TRAIL_LIFETIME
   );
@@ -491,24 +495,34 @@ function drawMouseTrail() {
   for (let i = 0; i < mouseTrail.length; i++) {
     const point = mouseTrail[i];
     const age = currentTime - point.timestamp;
-    const alpha = map(age, 0, TRAIL_LIFETIME, 255, 0);
+    const alpha = map(age, 0, TRAIL_LIFETIME, 3000, 0);
     
     stroke(TRAIL_COLOR[0], TRAIL_COLOR[1], TRAIL_COLOR[2], alpha);
+    
     if (i === 0) {
       vertex(point.x, point.y);
     } else {
       const prev = mouseTrail[i - 1];
-      if (dist(point.x, point.y, prev.x, prev.y) < 50) {
+      const distance = dist(point.x, point.y, prev.x, prev.y);
+      
+      if (distance < 50) {
+       
         vertex(point.x, point.y);
       } else {
-        endShape();
-        beginShape();
-        vertex(point.x, point.y);
+      
+        const steps = Math.ceil(distance / 100);
+        for (let j = 0; j <= steps; j++) {
+          const t = j / steps;
+          const interpX = lerp(prev.x, point.x, t);
+          const interpY = lerp(prev.y, point.y, t);
+          vertex(interpX, interpY);
+        }
       }
     }
   }
   endShape();
 }
+
 function setup() {
   createCanvas(1920, 1080);
   textFont('monospace');
@@ -527,18 +541,30 @@ function draw() {
   
   fill(255);
   noStroke();
-  rect(0, 0, 80, height);
+  rect(0, 0, 70, 320);
   
   drawMouseTrail();
-  
+
   fill(0);
   noStroke();
   textSize(15);
   textAlign(LEFT, TOP);
-  text('life is on the line_', 400, 20);
+  text('life is on the line_', 70, 20);
+
+  fill(0);
+  noStroke();
+  textSize(10);
+  textAlign(CENTER, TOP);
+  text('modern architecture is no longer a solely human endeavor. \nit is an emergent phenomenon, compiled to a complex interplay of \n\n<< human intention, \n<< digital systems, \n<< algorithmic logic. \n\nIt is (more.than.human). It is digital.', 960, 500)
+  
+  fill(0);
+  noStroke();
+  textSize(10);
+  textAlign(LEFT, TOP);
+  text('0001__(beyond tools) \n0010__(the fallacy of the perfect line) \n0011__(subversion through collaboration) \n0100__(hidden biases) \n0101__(reclaiming aesthetic) \n0110__(towards imperfect) \n0111__(flawless probugtion) \n1000__(experimentation is resistance)', 20, 950)
   
   hoveredShape = null;
-  if (currentTool instanceof EraserTool && mouseX > 80) {
+  if (currentTool instanceof EraserTool && mouseX > 70) {
     for (let shape of [...lines, ...rectangles, ...circles, ...curves]) {
       if (shape.containsPoint(mouseX, mouseY)) {
         hoveredShape = shape;
