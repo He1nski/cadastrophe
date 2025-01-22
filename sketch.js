@@ -561,7 +561,7 @@ function draw() {
   noStroke();
   textSize(10);
   textAlign(LEFT, TOP);
-  text('0001__(beyond tools) \n0010__(the fallacy of the perfect line) \n0011__(subversion through collaboration) \n0100__(hidden biases) \n0101__(reclaiming aesthetic) \n0110__(towards imperfect) \n0111__(flawless probugtion) \n1000__(experimentation is resistance)', 20, 950)
+  text('0001__(beyond tools) \n0010__(the fallacy of the perfect line) \n0011__(subversion through collaboration) \n0100__(hidden biases) \n0101__(reclaiming aesthetic) \n0110__(towards imperfect) \n0111__(flawless probugtion) \n1000__(experimentation is resistance) \n\nthank you for engaging with this project.amh', 20, 950)
   
   hoveredShape = null;
   if (currentTool instanceof EraserTool && mouseX > 70) {
