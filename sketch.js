@@ -469,7 +469,7 @@ class RotationTool extends Tool {
 
 function updateMouseTrail() {
   const currentTime = Date.now();
-  if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
+  if (mouseX > 70 && mouseX < windowWidth && mouseY > 0 && mouseY < windowHeight) {
 
     if (mouseTrail.length === 0 || 
         mouseTrail[mouseTrail.length - 1].x !== mouseX || 
@@ -524,14 +524,16 @@ function drawMouseTrail() {
 }
 
 function setup() {
-  createCanvas(1920, 1080);
+  createCanvas(windowWidth, windowHeight);
   textFont('monospace');
+  
+  const toolSpacing = 50;
   new LineTool('line', null, 20, 20);
-  new RectangleTool('rectangle', null, 20, 70);
-  new CircleTool('circle', null, 20, 120);
-  new BezierTool('bezier', null, 20, 170);
-  new EraserTool('eraser', null, 20, 220);
-  new RotationTool('rotation', null, 20, 270);
+  new RectangleTool('rectangle', null, 20, 20 + toolSpacing);
+  new CircleTool('circle', null, 20, 20 + toolSpacing * 2);
+  new BezierTool('bezier', null, 20, 20 + toolSpacing * 3);
+  new EraserTool('eraser', null, 20, 20 + toolSpacing * 4);
+  new RotationTool('rotation', null, 20, 20 + toolSpacing * 5);
 }
 
 function draw() {
@@ -541,7 +543,7 @@ function draw() {
   
   fill(255);
   noStroke();
-  rect(0, 0, 70, 320);
+  rect(0, 0, 70, height);
   
   drawMouseTrail();
 
@@ -555,13 +557,13 @@ function draw() {
   noStroke();
   textSize(10);
   textAlign(CENTER, TOP);
-  text('modern architecture is no longer a solely human endeavor. \nit is an emergent phenomenon, compiled to a complex interplay of \n\n<< human intention, \n<< digital systems, \n<< algorithmic logic. \n\nIt is (more.than.human). It is digital.', 960, 500)
+  text('modern architecture is no longer a solely human endeavor. \nit is an emergent phenomenon, compiled to a complex interplay of \n\n<< human intention, \n<< digital systems, \n<< algorithmic logic. \n\nIt is (more.than.human). It is digital.',windowWidth/2, height/2);
   
   fill(0);
   noStroke();
   textSize(10);
   textAlign(LEFT, TOP);
-  text('0001__(beyond tools) \n0010__(the fallacy of the perfect line) \n0011__(subversion through collaboration) \n0100__(hidden biases) \n0101__(reclaiming aesthetic) \n0110__(towards imperfect) \n0111__(flawless probugtion) \n1000__(experimentation is resistance) \n\nthank you for engaging with this project.amh', 20, 950)
+  text('0001__(beyond tools) \n0010__(the fallacy of the perfect line) \n0011__(subversion through collaboration) \n0100__(hidden biases) \n0101__(reclaiming aesthetic) \n0110__(towards imperfect) \n0111__(flawless probugtion) \n1000__(experimentation is resistance) \n\nthank you for engaging with this project.amh',20, height - 150);
   
   hoveredShape = null;
   if (currentTool instanceof EraserTool && mouseX > 70) {
@@ -628,4 +630,8 @@ function mouseDragged() {
 function mouseReleased() {
   if (currentTool) {
   }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
 }
