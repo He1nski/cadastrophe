@@ -469,7 +469,7 @@ class RotationTool extends Tool {
 
 function updateMouseTrail() {
   const currentTime = Date.now();
-  if (mouseX > 70 && mouseX < windowWidth && mouseY > 0 && mouseY < windowHeight) {
+  if (mouseX > 0 && mouseX < windowWidth && mouseY > 0 && mouseY < windowHeight) {
 
     if (mouseTrail.length === 0 || 
         mouseTrail[mouseTrail.length - 1].x !== mouseX || 
