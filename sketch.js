@@ -234,7 +234,7 @@ class Tool {
 
   draw() {
     stroke(0);
-    ffill(this === currentTool ? 'rgb(220,115,80)' : '#FFFFFF');
+    fill(this === currentTool ? 'rgb(220,115,80)' : '#FFFFFF');
     rect(this.x, this.y, this.size, this.size);
     push();
     translate(this.x + this.size/2, this.y + this.size/2);
