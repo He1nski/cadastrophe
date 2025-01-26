@@ -1,5 +1,7 @@
 let currentTool = null;
 const tools = [];
+let temporaryText = null;
+let temporaryTextTimer = 0;
 let lines = [];
 let rectangles = [];
 let circles = [];
@@ -523,6 +525,11 @@ function drawMouseTrail() {
   endShape();
 }
 
+function displayTemporaryText(text) {
+  temporaryText = text;
+  temporaryTextTimer = millis() + 12000;
+}
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   textFont('monospace');
@@ -553,11 +560,15 @@ function draw() {
   textAlign(LEFT, TOP);
   text('life is on the line_', 70, 20);
 
-  fill(0);
-  noStroke();
-  textSize(10);
-  textAlign(CENTER, TOP);
-  text('modern architecture is no longer a solely human endeavor. \nit is an emergent phenomenon, compiled to a complex interplay of \n\n<< human intention, \n<< digital systems, \n<< algorithmic logic. \n\nIt is (more.than.human). It is digital.',windowWidth/2, height/2);
+ let displayText = (temporaryText !== null && millis() < temporaryTextTimer) ? temporaryText 
+  : 'modern architecture is no longer a solely human endeavor. \n\n<< human intention, \n<< digital systems, \n<< algorithmic logic. \n\nIt is (more.than.human). It is digital.';
+
+fill(0);
+noStroke();
+textSize(10);
+textAlign(CENTER, TOP);
+text(displayText, windowWidth/2, height/2);
+  
   
   fill(0);
   noStroke();
@@ -601,6 +612,33 @@ function draw() {
 }
 
 function mousePressed() {
+  const textAreaLeft = 20;
+  const textAreaTop = height - 150;
+  const textAreaRight = 300;
+  const textAreaBottom = height;
+
+  if (mouseX > textAreaLeft && mouseX < textAreaRight && mouseY > textAreaTop && mouseY < textAreaBottom) {
+    const lineHeight = 13;
+    const clickedLineIndex = Math.floor((mouseY - textAreaTop) / lineHeight);
+
+    const lines = [
+      { text: "0001__(beyond tools)", content: "0001__(beyond tools)\n\nthe pervasive influence of computer-aided design [cad] is more than a mere neutral instrument.\n[cad] systems subtly steer architectural outcomes towards efficiency, rationality,\nand standardization values undermining the potential for, life in design and beauty from irrationality." },
+      { text: "0010__(the fallacy of the perfect line)", content: "0010__(the fallacy of the perfect line) \n\nthe perfectly straight line is the fundament of [cad] driven design.\nit is a mathematical abstraction defined as the shortest distance between two points, alien to the irregularity of the natural world.\nit does not exist. it is an idea not an ideal and needs to be rejected as the foundation of architectural processes.\ndesign must embrace imperfection." },
+      { text: "0011__(subversion through collaboration)", content: "0011__(subversion through collaboration) \n\nwhile [cad] tools are positioned as enablers of precision, they influence creativity by imposing rigid frameworks.\nit can only be created what the system is capable of computing.\na conscious collaboration with these tools, subverting their default tendencies to\nexplore designs that defy conventions and celebrate unpredictability, is imperative." },
+      { text: "0100__(hidden biases)", content: "0100__(hidden biases)\n\n [cad] is never neutral.\nalgorithms and default settings reflect cultural, economic, and technological biases\nthat are a gateway to uniformity and commodification.\nthey carry inherent logic that is derived from software development not architecture or design.\narchitects must interrogate these biases and reclaim agency in the design process, resisting the homogenization of the built environment." },
+      { text: "0101__(reclaiming aesthetic)", content: "0101__(reclaiming aesthetic) \n\n a system based on algorithms is fundamentally geared towards efficiency.\nefficiency, however, must never be an innate virtue in architecture.\nemotional resonance must take precedence over sterile neocapitalistic optimization.\nthe dominance of [cad]’s metrics-driven logic must be challenged at all times." },
+      { text: "0110__(towards imperfect)", content: "0110__(towards imperfect) \n\nirregularity, texture, and unexpected qualities are the life of our entire environment.\nthe digital realm should not erase these attributes but amplify them,\nallowing us to craft spaces that resonate with human and ecological vitality." },
+      { text: "0111__(flawless probugtion)", content: "0111_(flawless probugtion) \n\na computer bug, often seen as an error, is a reminder that the digital realm is not immune to the unpredictability of creation.\nbugs tear the illusion of total control, perfection and precision, introducing chaos and unintended consequences into architectural production.\nfrustration yields appreciation." },
+      { text: "1000__(experimentation is resistance)", content: "1000__(experimentation is resistance) \n\nin the face of [cad]’s underlying push for standardization, experimentation becomes an act of resistance.\narchitects and designers need to use digital tools not to conform but to, seek out\nnew paradigms that challenge the norms of architectural production.\nif the machine fails, freezes or crashes you have found one of many invisible barriers." },     
+      { text: "", content: "modern architecture is no longer a solely human endeavor. \n\n<< human intention, \n<< digital systems, \n<< algorithmic logic. \n\nIt is (more.than.human). It is digital." },
+      { text: "thank you for engaging with this project.amh", content: ".augustin michael heinen for 'more than human' at tu berlin" }
+    ];
+
+    if (clickedLineIndex >= 0 && clickedLineIndex < lines.length) {
+      displayTemporaryText(lines[clickedLineIndex].content);
+    }
+  }
+
   for (let tool of tools) {
     if (tool.isClicked(mouseX, mouseY)) {
       if (currentTool === tool) {
@@ -617,6 +655,7 @@ function mousePressed() {
     currentTool.handlePress(mouseX, mouseY);
   }
 }
+
 
 function mouseDragged() {
   if (currentTool instanceof RotationTool && currentTool.selectedShape && currentTool.pivotSet) {
